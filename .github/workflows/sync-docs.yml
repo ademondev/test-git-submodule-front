@@ -40,9 +40,9 @@ jobs:
           # Check for changes and push
           if ! git diff --quiet || ! git diff --cached --quiet; then
             git add .
-            git commit -m "Auto-sync docs from backend (${GITHUB_SHA:0:8})" || true
+            git commit -m "Auto-sync docs from frontend (${GITHUB_SHA:0:8})" || true
             git push docs-remote "$TEMP_BRANCH":main
-            echo "✅ Docs synced successfully"
+            echo "✅ Docs synced successfully from frontend"
           else
-            echo "ℹ️ No docs changes to sync"
+            echo "ℹ️ No docs changes to sync from frontend"
           fi
