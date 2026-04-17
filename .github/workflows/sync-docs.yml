@@ -1,0 +1,48 @@
+name: Sync docs to docs repository
+
+on:
+  push:
+    branches: [develop, staging, main]
+    paths: ['docs/**']
+
+jobs:
+  sync-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.DOCS_SYNC_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+
+      - name: Add docs remote
+        run: |
+          git remote add docs-remote https://x-access-token:${{ secrets.DOCS_SYNC_TOKEN }}@github.com/ademondev/test-git-submodule-docs.git || true
+
+      - name: Push docs changes to docs repository
+        run: |
+          # Create temporary branch with docs changes
+          TEMP_BRANCH="docs-sync-$(date +%s)"
+          
+          # Fetch latest from docs repo
+          git fetch docs-remote
+          git checkout -b "$TEMP_BRANCH" docs-remote/main
+          
+          # Copy current docs files
+          rm -rf *.md *.txt 2>/dev/null || true
+          cp -r docs/* . 2>/dev/null || true
+          
+          # Check for changes and push
+          if ! git diff --quiet || ! git diff --cached --quiet; then
+            git add .
+            git commit -m "Auto-sync docs from backend (${GITHUB_SHA:0:8})" || true
+            git push docs-remote "$TEMP_BRANCH":main
+            echo "✅ Docs synced successfully"
+          else
+            echo "ℹ️ No docs changes to sync"
+          fi
