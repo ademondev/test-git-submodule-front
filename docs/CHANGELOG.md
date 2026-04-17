@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 1.6.0 (2026-04-17)
+
+### Added
+- Frontend repository integration with shared docs
+- Demonstration of multi-repo subtree synchronization
+- Cross-repository documentation updates
+
 ## Version 1.5.0 (2026-04-17)
 
 ### Added
